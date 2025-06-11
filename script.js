@@ -1,71 +1,38 @@
-body {
-  font-family: 'Quicksand', sans-serif;
-  background: linear-gradient(135deg, #cce0f9, #ecd4f9);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  height: 100vh;
-  margin: 0;
+
+const motivaciones = [
+  "¡Eres brillante, Flo!",
+  "¡Vamos que tú puedes!",
+  "¡Un pasito más y lo logras!",
+  "¡Eres una crack de las tablas!",
+  "¡Súper bien! ¡Sigue así!"
+];
+
+const stickers = [
+  "🌟", "🎉", "🍭", "🧁", "💖"
+];
+
+let num1 = 3;
+let num2 = 4;
+
+function nuevaPregunta() {
+  num1 = Math.floor(Math.random() * 10) + 1;
+  num2 = Math.floor(Math.random() * 10) + 1;
+  document.getElementById("problema").textContent = `${num1} × ${num2} = ?`;
+  document.getElementById("respuesta").value = "";
+  document.getElementById("resultado").textContent = "";
+  document.getElementById("motivacion").textContent = motivaciones[Math.floor(Math.random() * motivaciones.length)];
+  document.getElementById("sticker").textContent = "";
 }
 
-.container {
-  text-align: center;
-  background: white;
-  padding: 30px;
-  border-radius: 20px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-  position: relative;
-  width: 90%;
-  max-width: 400px;
+function verificar() {
+  const respuesta = parseInt(document.getElementById("respuesta").value);
+  if (respuesta === num1 * num2) {
+    document.getElementById("resultado").textContent = "¡Correcto!";
+    document.getElementById("sticker").textContent = stickers[Math.floor(Math.random() * stickers.length)];
+  } else {
+    document.getElementById("resultado").textContent = "Ups, intenta otra vez 💪";
+  }
+  setTimeout(nuevaPregunta, 2000);
 }
 
-h1 {
-  color: #7e5bef;
-  margin-bottom: 10px;
-}
-
-.problema {
-  font-size: 24px;
-  margin: 15px 0;
-}
-
-input {
-  padding: 10px;
-  font-size: 18px;
-  border: 2px solid #b9bfff;
-  border-radius: 10px;
-  width: 60%;
-}
-
-button {
-  margin-top: 10px;
-  background-color: #ffd6f6;
-  color: #5e4b8b;
-  border: none;
-  padding: 10px 20px;
-  font-size: 16px;
-  border-radius: 12px;
-  cursor: pointer;
-  transition: 0.3s;
-}
-
-button:hover {
-  background-color: #ffb6eb;
-}
-
-.motivacion {
-  font-size: 18px;
-  color: #ff69b4;
-  margin: 10px 0;
-}
-
-.sticker {
-  margin-top: 20px;
-}
-
-.cinnamoroll {
-  width: 100px;
-  position: absolute;
-  top: -40px;
-  right: -40px;
-}
+window.onload = nuevaPregunta;
