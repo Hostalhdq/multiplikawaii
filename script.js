@@ -1,25 +1,71 @@
-let factorA, factorB;
-let correctAnswer;
-
-function newQuestion() {
-  factorA = Math.floor(Math.random() * 10) + 1;
-  factorB = Math.floor(Math.random() * 10) + 1;
-  correctAnswer = factorA * factorB;
-  document.getElementById("question").innerText = `¿Cuánto es ${factorA} × ${factorB}?`;
-  document.getElementById("answer").value = "";
-  document.getElementById("feedback").innerText = "";
+body {
+  font-family: 'Quicksand', sans-serif;
+  background: linear-gradient(135deg, #cce0f9, #ecd4f9);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  margin: 0;
 }
 
-function checkAnswer() {
-  const userAnswer = parseInt(document.getElementById("answer").value);
-  const feedback = document.getElementById("feedback");
-  if (userAnswer === correctAnswer) {
-    feedback.innerText = "¡Correcto! 🌟 Sigue así 💪";
-    document.getElementById("rewards").innerHTML += "🎉";
-    setTimeout(newQuestion, 1500);
-  } else {
-    feedback.innerText = "Ups... Intenta otra vez 🐾";
-  }
+.container {
+  text-align: center;
+  background: white;
+  padding: 30px;
+  border-radius: 20px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  position: relative;
+  width: 90%;
+  max-width: 400px;
 }
 
-window.onload = newQuestion;
+h1 {
+  color: #7e5bef;
+  margin-bottom: 10px;
+}
+
+.problema {
+  font-size: 24px;
+  margin: 15px 0;
+}
+
+input {
+  padding: 10px;
+  font-size: 18px;
+  border: 2px solid #b9bfff;
+  border-radius: 10px;
+  width: 60%;
+}
+
+button {
+  margin-top: 10px;
+  background-color: #ffd6f6;
+  color: #5e4b8b;
+  border: none;
+  padding: 10px 20px;
+  font-size: 16px;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+button:hover {
+  background-color: #ffb6eb;
+}
+
+.motivacion {
+  font-size: 18px;
+  color: #ff69b4;
+  margin: 10px 0;
+}
+
+.sticker {
+  margin-top: 20px;
+}
+
+.cinnamoroll {
+  width: 100px;
+  position: absolute;
+  top: -40px;
+  right: -40px;
+}
