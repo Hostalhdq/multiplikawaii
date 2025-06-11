@@ -1,0 +1,26 @@
+body {
+  font-family: 'Comic Sans MS', cursive, sans-serif;
+  background: linear-gradient(to bottom, #cfe9ff, #e0c8ff);
+  text-align: center;
+  padding: 2em;
+  color: #333;
+}
+#app {
+  background: white;
+  border-radius: 20px;
+  padding: 2em;
+  box-shadow: 0 0 10px rgba(0,0,0,0.1);
+}
+input {
+  padding: 0.5em;
+  margin-top: 1em;
+  font-size: 1em;
+}
+button {
+  margin-top: 1em;
+  padding: 0.5em 1em;
+  background-color: #87cefa;
+  border: none;
+  border-radius: 10px;
+  font-size: 1em;
+}
