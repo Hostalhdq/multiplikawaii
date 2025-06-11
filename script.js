@@ -1,10 +1,10 @@
 
 const motivaciones = [
-  "¡Eres brillante, Flo!",
-  "¡Vamos que tú puedes!",
-  "¡Un pasito más y lo logras!",
+  "¡Eres brillante, Mi hijita linda!",
+  "¡Vamos Flo que tú puedes!",
+  "¡Ya po! Concéntrate Flo!",
   "¡Eres una crack de las tablas!",
-  "¡Súper bien! ¡Sigue así!"
+  "¡Súper bien! ¡Te amo!"
 ];
 
 const stickers = [
@@ -27,10 +27,10 @@ function nuevaPregunta() {
 function verificar() {
   const respuesta = parseInt(document.getElementById("respuesta").value);
   if (respuesta === num1 * num2) {
-    document.getElementById("resultado").textContent = "¡Correcto!";
+    document.getElementById("resultado").textContent = "¡Correcto Flo!";
     document.getElementById("sticker").textContent = stickers[Math.floor(Math.random() * stickers.length)];
   } else {
-    document.getElementById("resultado").textContent = "Ups, intenta otra vez 💪";
+    document.getElementById("resultado").textContent = "Pucha Flo, intenta otra vez 💪";
   }
   setTimeout(nuevaPregunta, 2000);
 }
