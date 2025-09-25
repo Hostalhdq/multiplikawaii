@@ -1,0 +1,837 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🎭 Juego del Ahorcado - Para Florencia 🎭</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Comic Sans MS', cursive;
+            background: linear-gradient(135deg, #87ceeb, #b0e0e6, #e6f3ff, #ffffff);
+            min-height: 100vh;
+            color: #2c5aa0;
+            overflow-x: hidden;
+        }
+
+        .game-header {
+            text-align: center;
+            padding: 25px;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 0 0 40px 40px;
+            margin-bottom: 30px;
+            box-shadow: 0 6px 25px rgba(44, 90, 160, 0.15);
+        }
+
+        .title {
+            font-size: 3em;
+            color: #4682b4;
+            text-shadow: 2px 2px 6px rgba(44, 90, 160, 0.2);
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            font-size: 1.3em;
+            color: #2c5aa0;
+            margin-bottom: 20px;
+        }
+
+        .score-board {
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+            font-size: 1.4em;
+            color: #4682b4;
+            font-weight: bold;
+        }
+
+        .game-container {
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            gap: 50px;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+            flex-wrap: wrap;
+        }
+
+        .hangman-drawing {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 30px;
+            border: 3px solid #87ceeb;
+            box-shadow: 0 8px 30px rgba(135, 206, 235, 0.2);
+            min-width: 300px;
+            text-align: center;
+        }
+
+        .hangman-svg {
+            width: 250px;
+            height: 300px;
+            margin: 20px 0;
+        }
+
+        .hangman-part {
+            opacity: 0;
+            transition: opacity 0.5s ease-in-out;
+        }
+
+        .hangman-part.visible {
+            opacity: 1;
+        }
+
+        .game-area {
+            flex: 1;
+            max-width: 600px;
+            min-width: 300px;
+        }
+
+        .category-display {
+            background: linear-gradient(135deg, #87ceeb, #b0e0e6);
+            color: white;
+            padding: 15px 25px;
+            border-radius: 25px;
+            text-align: center;
+            font-size: 1.2em;
+            font-weight: bold;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 15px rgba(135, 206, 235, 0.3);
+            text-shadow: 1px 1px 2px rgba(44, 90, 160, 0.3);
+        }
+
+        .word-display {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 30px;
+            text-align: center;
+            margin-bottom: 30px;
+            border: 3px solid #b0e0e6;
+            box-shadow: 0 6px 20px rgba(176, 224, 230, 0.2);
+            position: relative;
+        }
+
+        .word-letters {
+            font-size: 2.5em;
+            font-weight: bold;
+            letter-spacing: 15px;
+            color: #2c5aa0;
+            font-family: 'Courier New', monospace;
+            text-shadow: 1px 1px 3px rgba(135, 206, 235, 0.3);
+            line-height: 1.2;
+        }
+
+        .letter-input {
+            margin: 20px 0;
+            text-align: center;
+        }
+
+        .letter-input input {
+            background: rgba(255, 255, 255, 0.9);
+            border: 3px solid #87ceeb;
+            border-radius: 15px;
+            padding: 15px 20px;
+            font-size: 1.5em;
+            text-align: center;
+            width: 80px;
+            color: #2c5aa0;
+            font-weight: bold;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+
+        .letter-input input:focus {
+            border-color: #4682b4;
+            box-shadow: 0 0 15px rgba(70, 130, 180, 0.3);
+            transform: scale(1.05);
+        }
+
+        .guess-button {
+            background: linear-gradient(135deg, #87ceeb, #4682b4);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            font-size: 1.2em;
+            border-radius: 20px;
+            cursor: pointer;
+            font-family: 'Comic Sans MS', cursive;
+            font-weight: bold;
+            margin: 0 10px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(70, 130, 180, 0.2);
+            text-shadow: 1px 1px 2px rgba(44, 90, 160, 0.3);
+        }
+
+        .guess-button:hover {
+            transform: scale(1.05) translateY(-2px);
+            box-shadow: 0 6px 20px rgba(70, 130, 180, 0.3);
+        }
+
+        .guess-button:active {
+            transform: scale(0.98);
+        }
+
+        .used-letters {
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 20px;
+            padding: 20px;
+            margin: 20px 0;
+            border: 2px solid #b0e0e6;
+        }
+
+        .used-letters h3 {
+            color: #4682b4;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        .letters-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            justify-content: center;
+            min-height: 20px;
+        }
+
+        .letter-badge {
+            background: linear-gradient(135deg, #e6f3ff, #b0e0e6);
+            color: #2c5aa0;
+            padding: 8px 12px;
+            border-radius: 15px;
+            font-weight: bold;
+            border: 2px solid #87ceeb;
+            box-shadow: 0 2px 8px rgba(135, 206, 235, 0.2);
+        }
+
+        .letter-badge.wrong {
+            background: linear-gradient(135deg, #ffb6c1, #ffc0cb);
+            color: #8b4513;
+            border-color: #ff69b4;
+        }
+
+        .message {
+            text-align: center;
+            font-size: 1.3em;
+            margin: 20px 0;
+            padding: 15px;
+            border-radius: 15px;
+            font-weight: bold;
+        }
+
+        .message.success {
+            background: linear-gradient(135deg, #98fb98, #90ee90);
+            color: #006400;
+            border: 3px solid #32cd32;
+        }
+
+        .message.error {
+            background: linear-gradient(135deg, #ffb6c1, #ffc0cb);
+            color: #8b0000;
+            border: 3px solid #ff69b4;
+        }
+
+        .game-over {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(255, 255, 255, 0.98);
+            padding: 40px;
+            border-radius: 25px;
+            text-align: center;
+            border: 4px solid #87ceeb;
+            box-shadow: 0 15px 40px rgba(135, 206, 235, 0.3);
+            z-index: 1000;
+            display: none;
+            max-width: 500px;
+        }
+
+        .game-over h2 {
+            color: #4682b4;
+            font-size: 2.5em;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 4px rgba(70, 130, 180, 0.2);
+        }
+
+        .game-over .word-reveal {
+            font-size: 2em;
+            color: #2c5aa0;
+            font-weight: bold;
+            margin: 20px 0;
+            padding: 15px;
+            background: linear-gradient(135deg, #e6f3ff, #b0e0e6);
+            border-radius: 15px;
+            border: 2px solid #87ceeb;
+        }
+
+        .hint-section {
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 20px;
+            padding: 20px;
+            margin: 20px 0;
+            border: 2px solid #b0e0e6;
+            text-align: center;
+        }
+
+        .hint-button {
+            background: linear-gradient(135deg, #b0e0e6, #87ceeb);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            font-size: 1em;
+            border-radius: 20px;
+            cursor: pointer;
+            font-family: 'Comic Sans MS', cursive;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            box-shadow: 0 3px 12px rgba(176, 224, 230, 0.2);
+            text-shadow: 1px 1px 2px rgba(135, 206, 235, 0.3);
+        }
+
+        .hint-button:hover {
+            transform: scale(1.05);
+        }
+
+        .hint-text {
+            margin-top: 15px;
+            font-style: italic;
+            color: #2c5aa0;
+            font-size: 1.1em;
+            background: linear-gradient(135deg, #e6f3ff, #ffffff);
+            padding: 12px;
+            border-radius: 12px;
+            border-left: 4px solid #87ceeb;
+        }
+
+        .stats {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: rgba(255, 255, 255, 0.9);
+            padding: 15px;
+            border-radius: 15px;
+            border: 2px solid #b0e0e6;
+        }
+
+        .stats-item {
+            display: flex;
+            justify-content: space-between;
+            margin: 5px 0;
+            color: #2c5aa0;
+            font-weight: bold;
+        }
+
+        @keyframes sparkle {
+            0% { transform: scale(0) rotate(0deg); opacity: 1; }
+            100% { transform: scale(2) rotate(360deg); opacity: 0; }
+        }
+
+        .sparkle {
+            position: absolute;
+            pointer-events: none;
+            font-size: 1.5em;
+            animation: sparkle 1.2s ease-out;
+        }
+
+        @keyframes celebration {
+            0% { transform: scale(1) rotate(0deg); }
+            25% { transform: scale(1.2) rotate(10deg); }
+            50% { transform: scale(1.1) rotate(-5deg); }
+            75% { transform: scale(1.3) rotate(5deg); }
+            100% { transform: scale(1) rotate(0deg); }
+        }
+
+        .celebrate {
+            animation: celebration 0.6s ease-in-out;
+        }
+
+        @media (max-width: 768px) {
+            .game-container {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .word-letters {
+                font-size: 2em;
+                letter-spacing: 8px;
+            }
+            
+            .title {
+                font-size: 2em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="game-header">
+        <h1 class="title">🎭 Juego del Ahorcado 🎭</h1>
+        <p class="subtitle">¡Hola Florencia! Adivina las palabras súper cool ✨</p>
+        <div class="score-board">
+            <div>🎯 Aciertos: <span id="wins">0</span></div>
+            <div>❤️ Vidas: <span id="lives">6</span></div>
+            <div>🏆 Racha: <span id="streak">0</span></div>
+        </div>
+    </div>
+
+    <div class="game-container">
+        <div class="hangman-drawing">
+            <h3 style="color: #4682b4; margin-bottom: 15px;">🎨 Dibujito</h3>
+            <svg class="hangman-svg" viewBox="0 0 200 250">
+                <!-- Base -->
+                <line class="hangman-part" id="part0" x1="10" y1="230" x2="150" y2="230" stroke="#4682b4" stroke-width="4"/>
+                <!-- Poste vertical -->
+                <line class="hangman-part" id="part1" x1="30" y1="230" x2="30" y2="20" stroke="#4682b4" stroke-width="4"/>
+                <!-- Poste horizontal -->
+                <line class="hangman-part" id="part2" x1="30" y1="20" x2="120" y2="20" stroke="#4682b4" stroke-width="4"/>
+                <!-- Cuerda -->
+                <line class="hangman-part" id="part3" x1="120" y1="20" x2="120" y2="40" stroke="#4682b4" stroke-width="3"/>
+                <!-- Cabeza -->
+                <circle class="hangman-part" id="part4" cx="120" cy="55" r="15" stroke="#4682b4" stroke-width="3" fill="none"/>
+                <!-- Cuerpo -->
+                <line class="hangman-part" id="part5" x1="120" y1="70" x2="120" y2="150" stroke="#4682b4" stroke-width="3"/>
+                <!-- Brazo izquierdo -->
+                <line class="hangman-part" id="part6" x1="120" y1="90" x2="90" y2="120" stroke="#4682b4" stroke-width="3"/>
+                <!-- Brazo derecho -->
+                <line class="hangman-part" id="part7" x1="120" y1="90" x2="150" y2="120" stroke="#4682b4" stroke-width="3"/>
+                <!-- Pierna izquierda -->
+                <line class="hangman-part" id="part8" x1="120" y1="150" x2="90" y2="180" stroke="#4682b4" stroke-width="3"/>
+                <!-- Pierna derecha -->
+                <line class="hangman-part" id="part9" x1="120" y1="150" x2="150" y2="180" stroke="#4682b4" stroke-width="3"/>
+            </svg>
+        </div>
+
+        <div class="game-area">
+            <div class="category-display" id="category">
+                🎬 Categoría: Cargando...
+            </div>
+
+            <div class="word-display">
+                <div class="word-letters" id="wordDisplay">
+                    _ _ _ _ _
+                </div>
+            </div>
+
+            <div class="letter-input">
+                <input type="text" id="letterInput" maxlength="1" placeholder="?" autocomplete="off">
+                <button class="guess-button" onclick="makeGuess()">💫 Adivinar</button>
+                <button class="guess-button" onclick="newWord()">🎲 Nueva Palabra</button>
+            </div>
+
+            <div class="hint-section">
+                <button class="hint-button" onclick="showHint()">💡 Dame una pista</button>
+                <div class="hint-text" id="hintText" style="display: none;"></div>
+            </div>
+
+            <div class="used-letters">
+                <h3>📝 Letras usadas</h3>
+                <div class="letters-grid" id="usedLetters"></div>
+            </div>
+
+            <div class="message" id="message" style="display: none;"></div>
+        </div>
+    </div>
+
+    <div class="stats">
+        <div class="stats-item">
+            <span>🎮 Palabras:</span>
+            <span id="totalWords">0</span>
+        </div>
+        <div class="stats-item">
+            <span>✨ % Éxito:</span>
+            <span id="successRate">0%</span>
+        </div>
+    </div>
+
+    <div class="game-over" id="gameOver">
+        <h2 id="gameOverTitle">🎉</h2>
+        <div class="word-reveal" id="wordReveal"></div>
+        <p id="gameOverMessage"></p>
+        <button class="guess-button" onclick="newWord()" style="margin-top: 20px;">🎮 ¡Otra Palabra!</button>
+    </div>
+
+    <script>
+        let currentWord = '';
+        let currentHint = '';
+        let currentCategory = '';
+        let guessedLetters = [];
+        let wrongGuesses = 0;
+        let maxWrongGuesses = 6;
+        let wins = 0;
+        let totalGames = 0;
+        let currentStreak = 0;
+        let hintUsed = false;
+
+        const categories = {
+            'Películas Disney': {
+                icon: '🎬',
+                words: [
+                    { word: 'FROZEN', hint: 'Princesa con poderes de hielo' },
+                    { word: 'MOANA', hint: 'Princesa del océano' },
+                    { word: 'ENCANTO', hint: 'Familia mágica colombiana' },
+                    { word: 'COCO', hint: 'Niño que ama la música' },
+                    { word: 'TANGLED', hint: 'Princesa con cabello muy largo' },
+                    { word: 'BRAVE', hint: 'Princesa escocesa arquera' },
+                    { word: 'MULAN', hint: 'Guerrera china valiente' },
+                    { word: 'POCAHONTAS', hint: 'Princesa nativa americana' }
+                ]
+            },
+            'Cantantes Pop': {
+                icon: '🎤',
+                words: [
+                    { word: 'TAYLOR SWIFT', hint: 'Cantante de "Shake It Off"' },
+                    { word: 'BILLIE EILISH', hint: 'Cantante de pelo verde' },
+                    { word: 'ARIANA GRANDE', hint: 'Cantante de "Thank U Next"' },
+                    { word: 'DOJA CAT', hint: 'Cantante de "Say So"' },
+                    { word: 'OLIVIA RODRIGO', hint: 'Cantante joven de "Good 4 U"' },
+                    { word: 'DUA LIPA', hint: 'Cantante de "Levitating"' },
+                    { word: 'SELENA GOMEZ', hint: 'Ex estrella de Disney' },
+                    { word: 'CAMILA CABELLO', hint: 'Ex integrante de Fifth Harmony' }
+                ]
+            },
+            'Series Netflix': {
+                icon: '📺',
+                words: [
+                    { word: 'STRANGER THINGS', hint: 'Niños y el mundo del revés' },
+                    { word: 'WEDNESDAY', hint: 'Hija gótica de la Familia Addams' },
+                    { word: 'HEARTSTOPPER', hint: 'Romance adolescente tierno' },
+                    { word: 'NEVER HAVE I EVER', hint: 'Adolescente india-americana' },
+                    { word: 'BRIDGERTON', hint: 'Romance en la época victoriana' },
+                    { word: 'EUPHORIA', hint: 'Drama adolescente intenso' },
+                    { word: 'THE UMBRELLA ACADEMY', hint: 'Hermanos con superpoderes' },
+                    { word: 'OUTER BANKS', hint: 'Aventuras en la playa' }
+                ]
+            },
+            'Animales Tiernos': {
+                icon: '🐾',
+                words: [
+                    { word: 'KOALA', hint: 'Marsupial australiano que come eucalipto' },
+                    { word: 'PANDA', hint: 'Oso blanco y negro de China' },
+                    { word: 'DELFIN', hint: 'Mamífero marino muy inteligente' },
+                    { word: 'PINGUINO', hint: 'Ave que no vuela pero nada' },
+                    { word: 'CONEJITO', hint: 'Animal que salta y come zanahorias' },
+                    { word: 'GATITO', hint: 'Bebé felino súper tierno' },
+                    { word: 'CACHORRO', hint: 'Bebé perro juguetón' },
+                    { word: 'HAMSTER', hint: 'Roedor pequeño y redondito' }
+                ]
+            }
+        };
+
+        function selectRandomWord() {
+            try {
+                const categoryNames = Object.keys(categories);
+                const randomCategory = categoryNames[Math.floor(Math.random() * categoryNames.length)];
+                const categoryData = categories[randomCategory];
+                const randomWord = categoryData.words[Math.floor(Math.random() * categoryData.words.length)];
+                
+                currentWord = randomWord.word.toUpperCase();
+                currentHint = randomWord.hint;
+                currentCategory = randomCategory;
+                
+                const categoryElement = document.getElementById('category');
+                if (categoryElement) {
+                    categoryElement.innerHTML = `${categoryData.icon} Categoría: ${randomCategory}`;
+                }
+            } catch (error) {
+                console.error('Error selecting word:', error);
+                // Palabra de fallback
+                currentWord = 'FROZEN';
+                currentHint = 'Princesa con poderes de hielo';
+                currentCategory = 'Películas Disney';
+            }
+        }
+
+        function displayWord() {
+            try {
+                const display = currentWord.split('').map(letter => {
+                    if (letter === ' ') return '&nbsp;&nbsp;&nbsp;';
+                    return guessedLetters.includes(letter) ? letter : '_';
+                }).join(' ');
+                
+                const wordElement = document.getElementById('wordDisplay');
+                if (wordElement) {
+                    wordElement.innerHTML = display;
+                }
+            } catch (error) {
+                console.error('Error displaying word:', error);
+            }
+        }
+
+        function makeGuess() {
+            try {
+                const input = document.getElementById('letterInput');
+                if (!input) return;
+                
+                const letter = input.value.toUpperCase();
+                
+                if (!letter) {
+                    showMessage('¡Escribe una letra! 📝', 'error');
+                    return;
+                }
+                
+                if (!letter.match(/[A-ZÑ]/)) {
+                    showMessage('¡Ingresa solo letras! 📝', 'error');
+                    input.value = '';
+                    return;
+                }
+                
+                if (guessedLetters.includes(letter)) {
+                    showMessage('¡Ya probaste esa letra! 🤔', 'error');
+                    input.value = '';
+                    return;
+                }
+                
+                guessedLetters.push(letter);
+                input.value = '';
+                
+                if (currentWord.includes(letter)) {
+                    showMessage('¡Excelente! ✨', 'success');
+                    addUsedLetter(letter, true);
+                    createSparkles();
+                    
+                    if (currentWord.split('').every(char => char === ' ' || guessedLetters.includes(char))) {
+                        setTimeout(winGame, 500);
+                    }
+                } else {
+                    wrongGuesses++;
+                    showMessage('¡Uy! Esa letra no está 💙', 'error');
+                    addUsedLetter(letter, false);
+                    updateHangman();
+                    
+                    if (wrongGuesses >= maxWrongGuesses) {
+                        setTimeout(loseGame, 500);
+                    }
+                }
+                
+                displayWord();
+                updateStats();
+            } catch (error) {
+                console.error('Error making guess:', error);
+            }
+        }
+
+        function addUsedLetter(letter, isCorrect) {
+            try {
+                const container = document.getElementById('usedLetters');
+                const grid = container?.querySelector('.letters-grid');
+                if (!grid) return;
+                
+                const badge = document.createElement('span');
+                badge.className = `letter-badge ${isCorrect ? '' : 'wrong'}`;
+                badge.textContent = letter;
+                grid.appendChild(badge);
+            } catch (error) {
+                console.error('Error adding used letter:', error);
+            }
+        }
+
+        function updateHangman() {
+            try {
+                const part = document.getElementById(`part${wrongGuesses - 1}`);
+                if (part) {
+                    part.classList.add('visible');
+                }
+            } catch (error) {
+                console.error('Error updating hangman:', error);
+            }
+        }
+
+        function showMessage(text, type) {
+            try {
+                const message = document.getElementById('message');
+                if (!message) return;
+                
+                message.textContent = text;
+                message.className = `message ${type}`;
+                message.style.display = 'block';
+                
+                setTimeout(() => {
+                    message.style.display = 'none';
+                }, 2500);
+            } catch (error) {
+                console.error('Error showing message:', error);
+            }
+        }
+
+        function createSparkles() {
+            try {
+                const container = document.querySelector('.word-display');
+                if (!container) return;
+                
+                const sparkleEmojis = ['✨', '⭐', '🌟', '💫', '🎊'];
+                
+                for (let i = 0; i < 5; i++) {
+                    setTimeout(() => {
+                        const sparkle = document.createElement('div');
+                        sparkle.className = 'sparkle';
+                        sparkle.textContent = sparkleEmojis[Math.floor(Math.random() * sparkleEmojis.length)];
+                        sparkle.style.position = 'absolute';
+                        sparkle.style.left = Math.random() * container.offsetWidth + 'px';
+                        sparkle.style.top = Math.random() * container.offsetHeight + 'px';
+                        
+                        container.appendChild(sparkle);
+                        
+                        setTimeout(() => {
+                            if (sparkle.parentNode) {
+                                sparkle.remove();
+                            }
+                        }, 1200);
+                    }, i * 100);
+                }
+            } catch (error) {
+                console.error('Error creating sparkles:', error);
+            }
+        }
+
+        function winGame() {
+            try {
+                wins++;
+                totalGames++;
+                currentStreak++;
+                
+                const gameOver = document.getElementById('gameOver');
+                const gameOverTitle = document.getElementById('gameOverTitle');
+                const wordReveal = document.getElementById('wordReveal');
+                const gameOverMessage = document.getElementById('gameOverMessage');
+                
+                if (gameOverTitle) gameOverTitle.textContent = '🎉 ¡GENIAL FLORENCIA! 🎉';
+                if (wordReveal) wordReveal.innerHTML = `La palabra era: <br><strong>${currentWord}</strong>`;
+                if (gameOverMessage) gameOverMessage.textContent = `¡Lo lograste! ${hintUsed ? 'Usaste una pista, pero está bien 😊' : '¡Y sin pistas! 🌟'}`;
+                
+                if (gameOver) gameOver.style.display = 'block';
+                
+                // Celebración
+                const gameArea = document.querySelector('.game-area');
+                if (gameArea) {
+                    gameArea.classList.add('celebrate');
+                    setTimeout(() => {
+                        gameArea.classList.remove('celebrate');
+                    }, 600);
+                }
+            } catch (error) {
+                console.error('Error in win game:', error);
+            }
+        }
+
+        function loseGame() {
+            try {
+                totalGames++;
+                currentStreak = 0;
+                
+                const gameOver = document.getElementById('gameOver');
+                const gameOverTitle = document.getElementById('gameOverTitle');
+                const wordReveal = document.getElementById('wordReveal');
+                const gameOverMessage = document.getElementById('gameOverMessage');
+                
+                if (gameOverTitle) gameOverTitle.textContent = '💙 ¡Casi lo logras!';
+                if (wordReveal) wordReveal.innerHTML = `La palabra era: <br><strong>${currentWord}</strong>`;
+                if (gameOverMessage) gameOverMessage.textContent = '¡No te preocupes! La próxima lo vas a lograr 😊';
+                
+                if (gameOver) gameOver.style.display = 'block';
+            } catch (error) {
+                console.error('Error in lose game:', error);
+            }
+        }
+
+        function showHint() {
+            try {
+                const hintText = document.getElementById('hintText');
+                if (hintText) {
+                    hintText.textContent = `💡 Pista: ${currentHint}`;
+                    hintText.style.display = 'block';
+                    hintUsed = true;
+                }
+            } catch (error) {
+                console.error('Error showing hint:', error);
+            }
+        }
+
+        function updateStats() {
+            try {
+                const livesElement = document.getElementById('lives');
+                const winsElement = document.getElementById('wins');
+                const streakElement = document.getElementById('streak');
+                const totalWordsElement = document.getElementById('totalWords');
+                const successRateElement = document.getElementById('successRate');
+                
+                if (livesElement) livesElement.textContent = maxWrongGuesses - wrongGuesses;
+                if (winsElement) winsElement.textContent = wins;
+                if (streakElement) streakElement.textContent = currentStreak;
+                if (totalWordsElement) totalWordsElement.textContent = totalGames;
+                
+                const successRate = totalGames > 0 ? Math.round((wins / totalGames) * 100) : 0;
+                if (successRateElement) successRateElement.textContent = successRate + '%';
+            } catch (error) {
+                console.error('Error updating stats:', error);
+            }
+        }
+
+        function newWord() {
+            try {
+                // Resetear el juego
+                guessedLetters = [];
+                wrongGuesses = 0;
+                hintUsed = false;
+                
+                // Limpiar interfaz
+                const usedLettersGrid = document.querySelector('#usedLetters .letters-grid');
+                if (usedLettersGrid) {
+                    usedLettersGrid.innerHTML = '';
+                }
+                
+                const gameOver = document.getElementById('gameOver');
+                if (gameOver) gameOver.style.display = 'none';
+                
+                const hintText = document.getElementById('hintText');
+                if (hintText) hintText.style.display = 'none';
+                
+                const message = document.getElementById('message');
+                if (message) message.style.display = 'none';
+                
+                // Limpiar dibujo del ahorcado
+                for (let i = 0; i < 10; i++) {
+                    const part = document.getElementById(`part${i}`);
+                    if (part) part.classList.remove('visible');
+                }
+                
+                // Seleccionar nueva palabra
+                selectRandomWord();
+                displayWord();
+                updateStats();
+                
+                // Enfocar el input
+                const letterInput = document.getElementById('letterInput');
+                if (letterInput) {
+                    letterInput.focus();
+                    letterInput.value = '';
+                }
+            } catch (error) {
+                console.error('Error starting new word:', error);
+            }
+        }
+
+        // Event listener para presionar Enter
+        document.addEventListener('DOMContentLoaded', function() {
+            try {
+                const letterInput = document.getElementById('letterInput');
+                if (letterInput) {
+                    letterInput.addEventListener('keypress', function(e) {
+                        if (e.key === 'Enter') {
+                            makeGuess();
+                        }
+                    });
+                }
+                
+                // Inicializar el juego
+                newWord();
+            } catch (error) {
+                console.error('Error initializing game:', error);
+            }
+        });
+    </script>
+</body>
+</html>
